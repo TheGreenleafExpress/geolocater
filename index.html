@@ -2,46 +2,60 @@
 <html>
 <head>
   <title>Geolocation Example</title>
-  <style>
-    #address {
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Geolocation Example</h1>
-  <button onclick="getLocation()">Get Location</button>
-  <p id="address"></p>
-
   <script>
     function getLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
       } else {
         alert("Geolocation is not supported by this browser.");
       }
     }
 
     function showPosition(position) {
-      var latitude = position.coords.latitude;
-      var longitude = position.coords.longitude;
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
 
-      var geocoder = new google.maps.Geocoder();
-      var latlng = new google.maps.LatLng(latitude, longitude);
+      const geocoder = new google.maps.Geocoder();
+      const latLng = new google.maps.LatLng(latitude, longitude);
 
-      geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
+      geocoder.geocode({ 'latLng': latLng }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
           if (results[0]) {
-            document.getElementById("address").innerHTML = "Address: " + results[0].formatted_address;
+            const address = results[0].formatted_address;
+            document.getElementById("location").value = address;
           } else {
-            document.getElementById("address").innerHTML = "No address found.";
+            alert("No address found for this location.");
           }
         } else {
-          document.getElementById("address").innerHTML = "Geocoder failed due to: " + status;
+          alert("Geocoder failed due to: " + status);
         }
       });
     }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("An unknown error occurred.");
+          break;
+      }
+    }
   </script>
+</head>
+<body>
+  <h1>Geolocation Example</h1>
+  <button onclick="getLocation()">Get Location</button>
+  <input type="text" id="location" readonly>
+
+  <!-- Include the Google Maps JavaScript API script -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 </body>
 </html>
