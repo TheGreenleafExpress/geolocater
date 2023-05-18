@@ -15,21 +15,18 @@
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
 
-      const geocoder = new google.maps.Geocoder();
-      const latLng = new google.maps.LatLng(latitude, longitude);
+      const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
 
-      geocoder.geocode({ 'latLng': latLng }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-          if (results[0]) {
-            const address = results[0].formatted_address;
-            document.getElementById("location").value = address;
-          } else {
-            alert("No address found for this location.");
-          }
-        } else {
-          alert("Geocoder failed due to: " + status);
-        }
-      });
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const address = data.display_name;
+          alert("Your address: " + address);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert("An error occurred while retrieving the address.");
+        });
     }
 
     function showError(error) {
@@ -53,9 +50,5 @@
 <body>
   <h1>Geolocation Example</h1>
   <button onclick="getLocation()">Get Location</button>
-  <input type="text" id="location" readonly>
-
-  <!-- Include the Google Maps JavaScript API script -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 </body>
 </html>
